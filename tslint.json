@@ -1,0 +1,79 @@
+{
+    "defaultSeverity": "error",
+    "lintOptions": {
+        "typeCheck": true
+    },
+    "rules": {
+        "adjacent-overload-signatures": true,
+        "await-promise": [true, "RequestPromise", "Bluebird"],
+        "class-name": true,
+        "comment-format": [true, "check-space"],
+        "eofline": true,
+        "indent": [true, "spaces", 4],
+        "linebreak-style": [true, "LF"],
+        "max-line-length": [true, 120],
+        "member-access": [true, "no-public"],
+        "member-ordering": [true, {
+            "order": [
+                "public-static-field",
+                "protected-static-field",
+                "private-static-field",
+                "public-instance-field",
+                "protected-instance-field",
+                "private-instance-field",
+                "constructor",
+                "public-static-method",
+                "protected-static-method",
+                "private-static-method",
+                "public-instance-method",
+                "protected-instance-method",
+                "private-instance-method"
+            ]
+        }],
+        "no-consecutive-blank-lines": true,
+        "no-floating-promises": [true, "RequestPromise", "Bluebird"],
+        "no-inferrable-types": [true, "ignore-params", "ignore-properties"],
+        "no-trailing-whitespace": true,
+        "no-var-keyword": true,
+        "object-literal-sort-keys": true,
+        "only-arrow-functions": [true, "allow-declarations"],
+        "ordered-imports": true,
+        "prefer-const": true,
+        "prefer-template": [true, "allow-single-concat"],
+        "quotemark": [true, "single"],
+        "semicolon": [true, "always"],
+        "space-before-function-paren": [ true, {
+            "anonymous": "never",
+            "named": "never",
+            "asyncArrow": "always"
+        }],
+        "trailing-comma": [true, {"multiline": "always", "singleline": "never"}],
+        "triple-equals": true,
+        "typedef": [true, "call-signature", "parameter", "property-declaration"],
+        "typedef-whitespace": [true, {
+            "call-signature": "nospace",
+            "index-signature": "nospace",
+            "parameter": "nospace",
+            "property-declaration": "nospace",
+            "variable-declaration": "nospace"
+        }, {
+            "call-signature": "onespace",
+            "index-signature": "onespace",
+            "parameter": "onespace",
+            "property-declaration": "onespace",
+            "variable-declaration": "onespace"
+        }],
+        "whitespace": [
+            true,
+            "check-branch",
+            "check-decl",
+            "check-operator",
+            "check-module",
+            "check-separator",
+            "check-type",
+            "check-typecast",
+            "check-preblock"
+        ]
+    },
+    "rulesDirectory": []
+}
