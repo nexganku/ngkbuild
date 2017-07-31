@@ -16,6 +16,8 @@ import {
     TaskContext,
 } from './task';
 import util = require('util');
+import path = require('path');
+import fs = require('fs-extra');
 
 class GraphNode {
     dbNode: DbNode;
@@ -231,6 +233,17 @@ class Updater {
             output: [],
         };
         try {
+            // Ensure output directories are created.
+            // TODO: make this more efficient.
+            for (const node of graphNode.children) {
+                const dbNode = node.dbNode;
+                if (dbNode.t !== 0)
+                    continue;
+                const dir = path.dirname(dbNode.k);
+                if (dir)
+                    await fs.mkdirp(dir);
+            }
+
             const ret = fn(ctx);
             if (ret)
                 await ret;
