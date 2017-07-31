@@ -224,7 +224,8 @@ class Updater {
     private async updateCommandNode(graphNode: GraphNode, commandNode: CommandNode): Promise<WorkerResult> {
         const fn = commandNode.fn;
         if (!fn)
-            throw new Error('commandNode.fn is undefined, this should not happen');
+            throw new Error('commandNode.fn is undefined, this should not happen. ' +
+                            `key: ${commandNode.k}, description: ${commandNode.description}`);
         const ctx: TaskContext = {
             additionalDeps: [],
             output: [],

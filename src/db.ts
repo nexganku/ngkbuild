@@ -124,8 +124,6 @@ export class Database {
                 this.fileNodes.set(node.k, node);
             else
                 this.commandNodes.set(node.k, node);
-            if (node.u)
-                this.markUpdate(node);
         }
     }
 
@@ -172,6 +170,8 @@ export class Database {
             this.markUpdate(node);
         } else {
             node.active = true;
+            if (node.u)
+                this.markUpdate(node);
         }
         return node;
     }
@@ -184,6 +184,8 @@ export class Database {
             this.markUpdate(node);
         } else {
             node.fn = fn;
+            if (node.u)
+                this.markUpdate(node);
         }
         return node;
     }
