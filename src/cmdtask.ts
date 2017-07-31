@@ -51,6 +51,8 @@ function runCommand(command: string[], output: Buffer[]): Promise<void> {
             reject(new Error(`Command returned code ${code}, signal ${signal}`));
         });
         const chunkCallback = (chunk: string | Buffer) => {
+            if (!output.length)
+                output.push(Buffer.from(command.map(quote).join(' ') + '\n'));
             output.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
         };
         cp.stdout.on('data', chunkCallback);
