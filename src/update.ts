@@ -7,6 +7,7 @@ import {
     Database,
     DbNode,
     FileNode,
+    NodeType,
     statFile,
 } from './db';
 import {
@@ -77,7 +78,7 @@ class Graph {
         node = new GraphNode(dbNode);
         this.nodes.set(dbNode, node);
         this.rootNodes.add(node);
-        if (node.dbNode.t === 1)
+        if (node.dbNode.t === NodeType.Command)
             this.commandNodes.add(node.dbNode);
         return node;
     }
@@ -98,7 +99,7 @@ class Graph {
         }
         this.nodes.delete(node.dbNode);
         this.rootNodes.delete(node);
-        if (node.dbNode.t === 1)
+        if (node.dbNode.t === NodeType.Command)
             this.commandNodes.delete(node.dbNode);
     }
 
@@ -197,7 +198,7 @@ class Updater {
                 this.workers.delete(result.graphNode);
                 this.printResult(result);
                 const dbNode = result.graphNode.dbNode;
-                if (dbNode.t === 1) {
+                if (dbNode.t === NodeType.Command) {
                     const description = dbNode.description || dbNode.k;
                     numUpdated++;
                     this.progress.status = `[${numUpdated}/${totalUpdates}] ${description}`;
@@ -248,7 +249,7 @@ class Updater {
 
     private async updateNode(graphNode: GraphNode): Promise<WorkerResult> {
         let result: WorkerResult;
-        if (graphNode.dbNode.t === 0)
+        if (graphNode.dbNode.t === NodeType.File)
             result = await this.updateFileNode(graphNode, graphNode.dbNode);
         else
             result = await this.updateCommandNode(graphNode, graphNode.dbNode);

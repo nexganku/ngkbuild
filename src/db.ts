@@ -8,10 +8,18 @@ import {
 // The key names are very short to reduce database file size.
 
 /**
+ * Node types.
+ */
+export enum NodeType {
+    File,
+    Command,
+}
+
+/**
  * Node representing a file.
  */
 export interface FileNode {
-    t: 0;
+    t: NodeType.File;
     /** Node key: File path. */
     k: string;
     /** Last mtime, negative if the file does not exist or last mtime not available. */
@@ -35,7 +43,7 @@ export function createFileNode(filename: string): FileNode {
         k: filename,
         m: -1,
         s: -1,
-        t: 0,
+        t: NodeType.File,
         u: true,
     };
 }
@@ -57,7 +65,7 @@ export function fileNodeToJson(fileNode: FileNode): string {
  * Node representing a command.
  */
 export interface CommandNode {
-    t: 1;
+    t: NodeType.Command;
     /** Node key. */
     k: string;
     /** Additional file deps. */
@@ -77,7 +85,7 @@ export function createCommandNode(key: string, fn: TaskFunction): CommandNode {
         d: [],
         fn,
         k: key,
-        t: 1,
+        t: NodeType.Command,
         u: false,
     };
 }
@@ -118,7 +126,7 @@ export class Database {
         this.updateNodes = new Set();
         this.edges = new Map();
         for (const node of nodes) {
-            if (node.t === 0)
+            if (node.t === NodeType.File)
                 this.fileNodes.set(node.k, node);
             else
                 this.commandNodes.set(node.k, node);
