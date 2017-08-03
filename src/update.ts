@@ -174,6 +174,19 @@ class Updater {
             this.graph.addSubgraphFromDatabase(this.db, dbNode);
 
         if (outputs) {
+            const oldOutputs = outputs;
+            outputs = [];
+            for (const x of oldOutputs) {
+                if (!x.endsWith(path.sep)) {
+                    outputs.push(x);
+                    continue;
+                }
+
+                for (const fileName of this.db.fileNodes.keys()) {
+                    if (fileName.startsWith(x))
+                        outputs.push(fileName);
+                }
+            }
             // construct a new graph that will only build `outputs` and its dependencies.
             const srcGraph = this.graph;
             this.graph = new Graph();
