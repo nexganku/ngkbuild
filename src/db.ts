@@ -106,7 +106,6 @@ export class Database {
     readonly fileNodes: Map<string, FileNode>;
     readonly commandNodes: Map<string, CommandNode>;
     readonly updateNodes: Set<DbNode>;
-    readonly commandUpdateNodes: Set<CommandNode>;
     readonly edges: Map<DbNode, Set<DbNode>>;
     private filename?: string;
 
@@ -117,7 +116,6 @@ export class Database {
         this.fileNodes = new Map();
         this.commandNodes = new Map();
         this.updateNodes = new Set();
-        this.commandUpdateNodes = new Set();
         this.edges = new Map();
         for (const node of nodes) {
             if (node.t === 0)
@@ -152,14 +150,16 @@ export class Database {
     markUpdate(node: DbNode): void {
         node.u = true;
         this.updateNodes.add(node);
-        if (node.t === 1)
-            this.commandUpdateNodes.add(node);
     }
 
     unmarkUpdate(node: DbNode): void {
         node.u = false;
         this.updateNodes.delete(node);
-        this.commandUpdateNodes.delete(node as CommandNode);
+    }
+
+    getFileNode(filename: string): FileNode | undefined {
+        const node = this.fileNodes.get(filename);
+        return node && node.active ? node : undefined;
     }
 
     addFileNode(filename: string): FileNode {

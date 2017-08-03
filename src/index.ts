@@ -38,6 +38,11 @@ export interface RunOptions {
      * Default: number of CPU cores in the system.
      */
     maxWorkers?: number;
+
+    /**
+     * If provided, only these outputs (and their dependencies) will be rebuilt if outdated.
+     */
+    outputs?: string[];
 }
 
 /**
@@ -68,7 +73,7 @@ class BuilderImpl implements Builder {
             options = {};
         const progress = createProgress();
         await scan(this.db, options.maxFds || 100);
-        await update(this.db, options.maxWorkers || os.cpus().length, progress);
+        await update(this.db, options.maxWorkers || os.cpus().length, progress, options.outputs);
         progress.unrender();
     }
 }

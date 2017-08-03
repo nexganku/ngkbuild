@@ -36,10 +36,13 @@ class Graph {
     private nodes: Map<DbNode, GraphNode>;
     /** Graph nodes with no incoming edges. */
     private rootNodes: Set<GraphNode>;
+    /** Command nodes inside the graph */
+    private commandNodes: Set<CommandNode>;
 
     constructor() {
         this.nodes = new Map();
         this.rootNodes = new Set();
+        this.commandNodes = new Set();
     }
 
     /**
@@ -50,10 +53,21 @@ class Graph {
     }
 
     /**
+     * Returns the number of command nodes.
+     */
+    getNumCommandNodes(): number {
+        return this.commandNodes.size;
+    }
+
+    /**
      * Returns an iterator over the graph's root nodes.
      */
     getRootNodes(): IterableIterator<GraphNode> {
         return this.rootNodes.values();
+    }
+
+    getNode(dbNode: DbNode): GraphNode | undefined {
+        return this.nodes.get(dbNode);
     }
 
     addNode(dbNode: DbNode): GraphNode {
@@ -63,6 +77,8 @@ class Graph {
         node = new GraphNode(dbNode);
         this.nodes.set(dbNode, node);
         this.rootNodes.add(node);
+        if (node.dbNode.t === 1)
+            this.commandNodes.add(node.dbNode);
         return node;
     }
 
@@ -82,6 +98,8 @@ class Graph {
         }
         this.nodes.delete(node.dbNode);
         this.rootNodes.delete(node);
+        if (node.dbNode.t === 1)
+            this.commandNodes.delete(node.dbNode);
     }
 
     /**
@@ -104,6 +122,18 @@ class Graph {
             this.addEdge(node, child);
         }
         stack.delete(dbNode);
+        return node;
+    }
+
+    addParentsFromGraphNode(srcNode: GraphNode): GraphNode {
+        let node = this.nodes.get(srcNode.dbNode);
+        if (node)
+            return node; // subgraph already added
+        node = this.addNode(srcNode.dbNode);
+        for (const srcParent of srcNode.parents) {
+            const parent = this.addParentsFromGraphNode(srcParent);
+            this.addEdge(parent, node);
+        }
         return node;
     }
 }
@@ -138,11 +168,26 @@ class Updater {
         this.progress = progress;
     }
 
-    async update(): Promise<void> {
+    async update(outputs?: string[]): Promise<void> {
         for (const dbNode of this.db.updateNodes)
             this.graph.addSubgraphFromDatabase(this.db, dbNode);
 
-        const totalUpdates = this.db.commandUpdateNodes.size;
+        if (outputs) {
+            // construct a new graph that will only build `outputs` and its dependencies.
+            const srcGraph = this.graph;
+            this.graph = new Graph();
+            for (const output of outputs) {
+                const dbNode = this.db.getFileNode(output);
+                if (!dbNode)
+                    throw new Error(`not a file: ${output}`);
+                const srcNode = srcGraph.getNode(dbNode);
+                if (!srcNode)
+                    continue; // file not marked for update
+                this.graph.addParentsFromGraphNode(srcNode);
+            }
+        }
+
+        const totalUpdates = this.graph.getNumCommandNodes();
         let numUpdated = 0;
 
         while (this.graph.hasRootNodes()) {
@@ -288,7 +333,7 @@ class Updater {
 /**
  * Update
  */
-export function update(db: Database, maxWorkers: number, progress: Progress): Promise<void> {
+export function update(db: Database, maxWorkers: number, progress: Progress, outputs?: string[]): Promise<void> {
     const updater = new Updater(db, maxWorkers, progress);
-    return updater.update();
+    return updater.update(outputs);
 }
