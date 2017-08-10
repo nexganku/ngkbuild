@@ -182,9 +182,9 @@ class Updater {
                     continue;
                 }
 
-                for (const fileName of this.db.fileNodes.keys()) {
-                    if (fileName.startsWith(x))
-                        outputs.push(fileName);
+                for (const fileNode of this.db.fileNodes.values()) {
+                    if (fileNode.active && fileNode.k.startsWith(x))
+                        outputs.push(fileNode.k);
                 }
             }
             // construct a new graph that will only build `outputs` and its dependencies.
